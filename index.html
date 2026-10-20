@@ -1,382 +1,344 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Happy Dussehra</title>
-<link rel="icon" type="image/svg+xml" href="favicon.svg">
-<link rel="apple-touch-icon" href="favicon.svg">
-<meta name="theme-color" content="#2b0a3d">
-<style>
-  :root{
-    --bg1:#2b0a3d; --bg2:#8a1c1c; --bg3:#e8590c;
-    --gold:#ffd166; --cream:#fff6e5; --ink:#3a1200;
-  }
-  *{box-sizing:border-box;margin:0}
-  body{
-    min-height:100vh; font-family:Georgia,"Times New Roman",serif; color:var(--cream);
-    background:linear-gradient(180deg,var(--bg1) 0%,var(--bg2) 55%,var(--bg3) 100%) fixed;
-    overflow-x:hidden;
-  }
-  canvas{position:fixed;inset:0;pointer-events:none;z-index:2}
-  main{position:relative;z-index:1;max-width:880px;margin:0 auto;padding:0 16px 64px}
-  header{text-align:center;padding:56px 0 24px}
-  .bow{font-size:64px;line-height:1;filter:drop-shadow(0 0 16px var(--gold))}
-  h1{font-size:clamp(2.4rem,8vw,4.5rem);color:var(--gold);letter-spacing:.02em;margin-top:8px;text-shadow:0 0 24px rgba(255,209,102,.5)}
-  .deva{font-size:clamp(1.4rem,5vw,2.2rem);margin-top:4px;opacity:.95}
-  .tag{margin-top:12px;font-style:italic;opacity:.85}
-  .greet{margin-top:20px;font-size:1.3rem;color:var(--gold);min-height:1.6em}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Happy Dussehra - Victory of Good over Evil</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="apple-touch-icon" href="favicon.svg">
+  <meta name="theme-color" content="#1b1035">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background: radial-gradient(circle at 50% 30%, #1b1035, #080314 90%);
+      color: #fff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+      padding: 16px;
+    }
+    h1 {
+      font-size: 2.2rem;
+      letter-spacing: 2px;
+      color: #ffd166;
+      text-shadow: 0 0 15px rgba(255, 209, 102, 0.6);
+      margin-bottom: 8px;
+      text-align: center;
+    }
+    p {
+      color: #e0d6ff;
+      margin-bottom: 16px;
+      font-size: 1rem;
+      text-align: center;
+    }
+    #fx {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2;
+    }
+    .stage {
+      width: min(900px, 95vw);
+      max-height: 70vh;
+      aspect-ratio: 620 / 300;
+      border: 2px solid #4a2c82;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
+      background: radial-gradient(ellipse at 50% 120%, #5a1a3a 0%, #0d0722 65%);
+      overflow: hidden;
+      cursor: crosshair;
+    }
+    .stage svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    .controls {
+      margin-top: 15px;
+    }
+    button {
+      background: linear-gradient(135deg, #f77f00, #d62828);
+      color: white;
+      border: none;
+      padding: 10px 24px;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 25px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(214, 40, 40, 0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 20px rgba(247, 127, 0, 0.6);
+    }
+    .victory {
+      margin-top: 12px;
+      min-height: 1.5em;
+      color: #ffd166;
+      font-weight: 600;
+    }
 
-  /* ---------- battle scene ---------- */
-  .stage{margin:28px auto 8px;text-align:center}
-  .frame{
-    max-width:680px;margin:0 auto;border-radius:22px;overflow:hidden;
-    border:3px solid var(--gold);box-shadow:0 0 40px rgba(255,209,102,.25),0 12px 30px rgba(0,0,0,.4);
-    background:radial-gradient(ellipse at 50% 110%,#ff8c1a 0%,#a3241a 40%,#2b0a3d 85%);
-  }
-  .frame svg{display:block;width:100%;height:auto}
-  #halo{transform-box:fill-box;transform-origin:center;animation:halo 3s ease-in-out infinite}
-  @keyframes halo{50%{opacity:.55;transform:scale(1.08)}}
-  #halo.flash{animation:flash .6s ease-out}
-  @keyframes flash{0%{opacity:1;transform:scale(1.5)}100%{opacity:.35;transform:scale(1)}}
-  #fire{opacity:0;transition:opacity .3s}
-  #fire.on{opacity:1}
-  #fire.out{opacity:0;transition:opacity 1.8s ease-in 1.2s}
-  .flame{transform-box:fill-box;transform-origin:50% 100%;animation:flick .22s ease-in-out infinite alternate}
-  @keyframes flick{from{transform:scale(1.05,.85)}to{transform:scale(.92,1.18)}}
-  #effigy{transform-box:fill-box;transform-origin:50% 100%;
-    transition:transform 1.8s cubic-bezier(.5,0,.9,.5),opacity 1.8s ease-in,filter .9s}
-  #effigy.charred{filter:brightness(.45) sepia(.8) saturate(2)}
-  #effigy.fall{transform:rotate(9deg) translateY(28px) scale(.85);opacity:0}
-  #tipfire{opacity:0}
-  .twinkle{animation:tw 2.4s ease-in-out infinite}
-  @keyframes tw{50%{opacity:.2}}
-
-  button{
-    font:inherit;cursor:pointer;border:0;border-radius:999px;padding:12px 22px;
-    background:var(--gold);color:var(--ink);font-weight:bold;box-shadow:0 4px 0 #b8860b;
-  }
-  button:active{transform:translateY(3px);box-shadow:0 1px 0 #b8860b}
-  button:disabled{opacity:.6;cursor:default}
-  button.ghost{background:transparent;color:var(--cream);border:1px solid rgba(255,246,229,.5);box-shadow:none}
-  .victory{font-size:1.3rem;color:var(--gold);margin-top:14px;min-height:1.6em}
-
-  h2{text-align:center;color:var(--gold);margin:44px 0 18px;font-size:1.6rem}
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
-  .card{
-    background:rgba(255,246,229,.95);color:var(--ink);border-radius:16px;padding:20px;
-    border-top:6px solid var(--gold);box-shadow:0 8px 24px rgba(0,0,0,.3);
-    display:flex;flex-direction:column;gap:12px;justify-content:space-between;
-  }
-  .card p{line-height:1.5}
-  .card button{align-self:flex-start;padding:7px 14px;font-size:.85rem;background:var(--ink);color:var(--gold);box-shadow:none}
-  .row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
-  form{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:20px}
-  input{
-    font:inherit;padding:11px 16px;border-radius:999px;border:1px solid var(--gold);
-    background:rgba(255,246,229,.12);color:var(--cream);min-width:0;width:230px;
-  }
-  input::placeholder{color:rgba(255,246,229,.6)}
-  footer{text-align:center;margin-top:48px;opacity:.8;font-style:italic}
-  @media (prefers-reduced-motion:reduce){
-    .flame,#halo,.twinkle{animation:none}
-    #effigy{transition-duration:.01s}
-  }
-</style>
+    /* scene animation */
+    #halo { transform-box: fill-box; transform-origin: center; animation: halo 3s ease-in-out infinite; }
+    @keyframes halo { 50% { opacity: .55; transform: scale(1.08); } }
+    #halo.flash { animation: flash .6s ease-out; }
+    @keyframes flash { 0% { opacity: 1; transform: scale(1.5); } 100% { opacity: .35; transform: scale(1); } }
+    #fire { opacity: 0; transition: opacity .3s; }
+    #fire.on { opacity: 1; }
+    #fire.out { opacity: 0; transition: opacity 1.8s ease-in 1.2s; }
+    .flame { transform-box: fill-box; transform-origin: 50% 100%; animation: flick .22s ease-in-out infinite alternate; }
+    @keyframes flick { from { transform: scale(1.05, .85); } to { transform: scale(.92, 1.18); } }
+    #effigy { transform-box: fill-box; transform-origin: 50% 100%;
+      transition: transform 1.8s cubic-bezier(.5,0,.9,.5), opacity 1.8s ease-in, filter .9s; }
+    #effigy.charred { filter: brightness(.45) sepia(.8) saturate(2); }
+    #effigy.fall { transform: rotate(9deg) translateY(28px) scale(.85); opacity: 0; }
+    #effigy.instant { transition: none; }
+    #tipfire { opacity: 0; }
+    .twinkle { animation: tw 2.4s ease-in-out infinite; }
+    @keyframes tw { 50% { opacity: .2; } }
+    @media (prefers-reduced-motion: reduce) {
+      .flame, #halo, .twinkle { animation: none; }
+      #effigy { transition-duration: .01s; }
+    }
+  </style>
 </head>
 <body>
-<canvas id="fx"></canvas>
-<main>
-  <header>
-    <div class="bow">🏹</div>
-    <h1>Happy Dussehra</h1>
-    <div class="deva">विजयादशमी की हार्दिक शुभकामनाएँ</div>
-    <p class="tag">Victory of good over evil, light over darkness.</p>
-    <div class="greet" id="greet"></div>
-    <form id="nameForm">
-      <input id="name" placeholder="Add a name to personalise" maxlength="30" autocomplete="off">
-      <button type="submit">Greet</button>
-    </form>
-  </header>
+  <canvas id="fx"></canvas>
+  <h1>Happy Dussehra</h1>
+  <p>Click "Release Divine Arrow" or click the scene to shoot!</p>
 
-  <section class="stage">
-    <div class="frame">
-      <svg id="scene" viewBox="0 0 620 300" role="img" aria-label="Lord Rama draws his bow and shoots a flaming arrow at the ten-headed Ravana effigy">
-        <defs>
-          <radialGradient id="haloG"><stop offset="0" stop-color="#ffe9a8" stop-opacity=".95"/><stop offset=".6" stop-color="#ffd166" stop-opacity=".35"/><stop offset="1" stop-color="#ffd166" stop-opacity="0"/></radialGradient>
-          <linearGradient id="trailG" x1="0" x2="1"><stop offset="0" stop-color="#ffd166" stop-opacity="0"/><stop offset="1" stop-color="#ff7a00" stop-opacity=".9"/></linearGradient>
-          <linearGradient id="dhotiG" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#ffc233"/><stop offset="1" stop-color="#e89400"/></linearGradient>
-          <linearGradient id="robeG" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#8e1b1b"/><stop offset="1" stop-color="#4a0c0c"/></linearGradient>
-        </defs>
+  <div class="stage" id="stage">
+    <svg viewBox="0 0 620 300" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Lord Rama draws his bow and shoots a flaming arrow at the ten-headed Ravana effigy">
+      <defs>
+        <radialGradient id="haloG"><stop offset="0" stop-color="#ffe9a8" stop-opacity=".95"/><stop offset=".6" stop-color="#ffd166" stop-opacity=".35"/><stop offset="1" stop-color="#ffd166" stop-opacity="0"/></radialGradient>
+        <linearGradient id="trailG" x1="0" x2="1"><stop offset="0" stop-color="#ffd166" stop-opacity="0"/><stop offset="1" stop-color="#ff7a00" stop-opacity=".9"/></linearGradient>
+        <linearGradient id="dhotiG" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#ffc233"/><stop offset="1" stop-color="#e89400"/></linearGradient>
+        <linearGradient id="robeG" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#8e44ad"/><stop offset="1" stop-color="#4a1a6b"/></linearGradient>
+      </defs>
 
-        <!-- sky -->
-        <g id="stars" fill="#fff6e5"></g>
-        <circle cx="300" cy="46" r="20" fill="#fff1c9" opacity=".9"/>
-        <circle cx="309" cy="40" r="18" fill="#3a0f3a" opacity=".85"/>
+      <!-- sky -->
+      <g id="stars" fill="#e0d6ff"></g>
+      <circle cx="300" cy="46" r="20" fill="#fff1c9" opacity=".9"/>
+      <circle cx="309" cy="40" r="18" fill="#140a2c" opacity=".9"/>
 
-        <!-- ground + crowd -->
-        <path d="M0 268 Q310 252 620 268 L620 300 L0 300Z" fill="#1d0710"/>
-        <g id="crowd" fill="#12040a"></g>
+      <!-- ground + crowd -->
+      <path d="M0 268 Q310 254 620 268 L620 300 L0 300Z" fill="#1a0f33"/>
+      <path d="M0 268 Q310 254 620 268" stroke="#3d2667" stroke-width="2" fill="none"/>
+      <g id="crowd" fill="#0a0518"></g>
 
-        <!-- RAMA -->
-        <g id="rama">
-          <circle id="halo" cx="110" cy="98" r="46" fill="url(#haloG)"/>
-          <!-- legs -->
-          <path d="M96 226 L80 266" stroke="#2f5fa8" stroke-width="9" stroke-linecap="round"/>
-          <path d="M124 226 L144 266" stroke="#2f5fa8" stroke-width="9" stroke-linecap="round"/>
-          <path d="M72 268 h18 M138 268 h18" stroke="#ffd166" stroke-width="4" stroke-linecap="round"/>
-          <!-- dhoti -->
-          <path d="M92 166 L128 166 L138 228 L116 228 L110 200 L104 228 L82 228Z" fill="url(#dhotiG)"/>
-          <path d="M90 168 h40" stroke="#b30000" stroke-width="5"/>
-          <!-- quiver -->
-          <rect x="80" y="112" width="11" height="48" rx="4" fill="#7a3b12" transform="rotate(-18 85 136)"/>
-          <path d="M80 112 l-6 -12 M84 111 l-2 -13 M88 111 l2 -12" stroke="#ffd166" stroke-width="2"/>
-          <!-- torso -->
-          <path d="M97 116 L123 116 L127 168 L93 168Z" fill="#3a6fc0"/>
-          <path d="M99 117 L125 164" stroke="#ffd166" stroke-width="2.5"/>
-          <path d="M98 120 Q110 134 122 120" stroke="#ffd166" stroke-width="3" fill="none"/>
-          <!-- back (drawing) arm -->
-          <path id="backArm" d="M100 124 L168 145" stroke="#3a6fc0" stroke-width="8" stroke-linecap="round"/>
-          <!-- head -->
-          <rect x="105" y="110" width="10" height="8" fill="#3a6fc0"/>
-          <circle cx="110" cy="100" r="15" fill="#3a6fc0"/>
-          <path d="M116 98 l4 1" stroke="#1b2f55" stroke-width="2" stroke-linecap="round"/>
-          <circle cx="118" cy="98" r="1.4" fill="#fff"/>
-          <path d="M115 106 q3 2 6 0" stroke="#1b2f55" stroke-width="1.5" fill="none"/>
-          <path d="M112 90 v5" stroke="#e8211b" stroke-width="2"/>
-          <path d="M96 100 q-4 14 2 22" stroke="#1b1b2f" stroke-width="5" fill="none" stroke-linecap="round"/>
-          <!-- crown -->
-          <path d="M95 90 L98 66 L104 78 L110 56 L116 78 L122 66 L125 90Z" fill="#ffd166" stroke="#b8860b" stroke-width="1.5"/>
-          <circle cx="110" cy="80" r="3" fill="#e8211b"/>
-          <!-- bow -->
-          <path d="M168 58 Q206 145 168 232" stroke="#8b4513" stroke-width="6" fill="none" stroke-linecap="round"/>
-          <path d="M168 58 Q206 145 168 232" stroke="#ffd166" stroke-width="2" fill="none" stroke-dasharray="4 10"/>
-          <polyline id="string" points="168,58 168,145 168,232" stroke="#fff6e5" stroke-width="1.6" fill="none"/>
-          <!-- arrow -->
-          <g id="arrow" transform="translate(168 145)">
-            <rect id="trail" x="-140" y="-4" width="140" height="8" rx="4" fill="url(#trailG)" opacity="0"/>
-            <line x1="0" y1="0" x2="84" y2="0" stroke="#d9b38c" stroke-width="3"/>
-            <path d="M0 0 l-8 -6 M0 0 l-8 6 M7 0 l-8 -6 M7 0 l-8 6" stroke="#e8211b" stroke-width="2.5"/>
-            <path d="M84 -6 L98 0 L84 6Z" fill="#ffd166"/>
-            <g id="tipfire" transform="translate(94 0) rotate(-90)">
-              <path class="flame" d="M0 0 C-9 -10 -5 -22 0 -32 C5 -22 9 -10 0 0Z" fill="#ff7a00"/>
-              <path class="flame" d="M0 0 C-5 -7 -3 -14 0 -20 C3 -14 5 -7 0 0Z" fill="#ffe066"/>
-            </g>
+      <!-- RAMA -->
+      <g id="rama">
+        <circle id="halo" cx="110" cy="98" r="46" fill="url(#haloG)"/>
+        <path d="M96 226 L80 266" stroke="#2f5fa8" stroke-width="9" stroke-linecap="round"/>
+        <path d="M124 226 L144 266" stroke="#2f5fa8" stroke-width="9" stroke-linecap="round"/>
+        <path d="M72 268 h18 M138 268 h18" stroke="#ffd166" stroke-width="4" stroke-linecap="round"/>
+        <path d="M92 166 L128 166 L138 228 L116 228 L110 200 L104 228 L82 228Z" fill="url(#dhotiG)"/>
+        <path d="M90 168 h40" stroke="#b30000" stroke-width="5"/>
+        <rect x="80" y="112" width="11" height="48" rx="4" fill="#7a3b12" transform="rotate(-18 85 136)"/>
+        <path d="M80 112 l-6 -12 M84 111 l-2 -13 M88 111 l2 -12" stroke="#ffd166" stroke-width="2"/>
+        <path d="M97 116 L123 116 L127 168 L93 168Z" fill="#3a6fc0"/>
+        <path d="M99 117 L125 164" stroke="#ffd166" stroke-width="2.5"/>
+        <path d="M98 120 Q110 134 122 120" stroke="#ffd166" stroke-width="3" fill="none"/>
+        <path id="backArm" d="M100 124 L168 145" stroke="#3a6fc0" stroke-width="8" stroke-linecap="round"/>
+        <rect x="105" y="110" width="10" height="8" fill="#3a6fc0"/>
+        <circle cx="110" cy="100" r="15" fill="#3a6fc0"/>
+        <path d="M116 98 l4 1" stroke="#1b2f55" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="118" cy="98" r="1.4" fill="#fff"/>
+        <path d="M115 106 q3 2 6 0" stroke="#1b2f55" stroke-width="1.5" fill="none"/>
+        <path d="M112 90 v5" stroke="#e8211b" stroke-width="2"/>
+        <path d="M96 100 q-4 14 2 22" stroke="#1b1b2f" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <path d="M95 90 L98 66 L104 78 L110 56 L116 78 L122 66 L125 90Z" fill="#ffd166" stroke="#b8860b" stroke-width="1.5"/>
+        <circle cx="110" cy="80" r="3" fill="#e8211b"/>
+        <path d="M168 58 Q206 145 168 232" stroke="#d4af37" stroke-width="6" fill="none" stroke-linecap="round"/>
+        <path d="M168 58 Q206 145 168 232" stroke="#fff3c4" stroke-width="2" fill="none" stroke-dasharray="4 10"/>
+        <polyline id="string" points="168,58 168,145 168,232" stroke="#f1faee" stroke-width="1.6" fill="none"/>
+        <g id="arrow" transform="translate(168 145)">
+          <rect id="trail" x="-140" y="-4" width="140" height="8" rx="4" fill="url(#trailG)" opacity="0"/>
+          <line x1="0" y1="0" x2="84" y2="0" stroke="#ffd32a" stroke-width="3"/>
+          <path d="M0 0 l-8 -6 M0 0 l-8 6 M7 0 l-8 -6 M7 0 l-8 6" stroke="#00d2d3" stroke-width="2.5"/>
+          <path d="M84 -6 L98 0 L84 6Z" fill="#ff3838"/>
+          <g id="tipfire" transform="translate(94 0) rotate(-90)">
+            <path class="flame" d="M0 0 C-9 -10 -5 -22 0 -32 C5 -22 9 -10 0 0Z" fill="#ff7a00"/>
+            <path class="flame" d="M0 0 C-5 -7 -3 -14 0 -20 C3 -14 5 -7 0 0Z" fill="#ffe066"/>
           </g>
-          <!-- front (bow) arm -->
-          <path d="M120 124 L186 145" stroke="#3a6fc0" stroke-width="8" stroke-linecap="round"/>
-          <circle cx="186" cy="145" r="5.5" fill="#3a6fc0"/>
-          <circle id="pullHand" cx="168" cy="145" r="5.5" fill="#3a6fc0"/>
         </g>
+        <path d="M120 124 L186 145" stroke="#3a6fc0" stroke-width="8" stroke-linecap="round"/>
+        <circle cx="186" cy="145" r="5.5" fill="#3a6fc0"/>
+        <circle id="pullHand" cx="168" cy="145" r="5.5" fill="#3a6fc0"/>
+      </g>
 
-        <!-- RAVANA effigy -->
-        <g id="effigy">
-          <rect x="477" y="140" width="6" height="128" fill="#4a2a10"/>
-          <path d="M448 138 L512 138 L536 266 L424 266Z" fill="url(#robeG)"/>
-          <path d="M430 240 L436 230 L442 240 L448 230 L454 240 L460 230 L466 240 L472 230 L478 240 L484 230 L490 240 L496 230 L502 240 L508 230 L514 240 L520 230 L526 240 L532 230" stroke="#ffd166" stroke-width="2.5" fill="none"/>
-          <path d="M480 140 V264" stroke="#ffd166" stroke-width="2" stroke-dasharray="3 6"/>
-          <path d="M452 150 L414 206" stroke="#8e1b1b" stroke-width="13" stroke-linecap="round"/>
-          <path d="M508 150 L546 206" stroke="#8e1b1b" stroke-width="13" stroke-linecap="round"/>
-          <path d="M548 210 L560 150" stroke="#cfd8dc" stroke-width="5" stroke-linecap="round"/>
-          <path d="M540 206 h18" stroke="#ffd166" stroke-width="4" stroke-linecap="round"/>
-          <rect x="370" y="126" width="220" height="10" rx="5" fill="#ffd166"/>
-          <g id="heads"></g>
-        </g>
+      <!-- RAVANA effigy -->
+      <g id="effigy">
+        <rect x="477" y="140" width="6" height="128" fill="#4a2a10"/>
+        <path d="M448 138 L512 138 L536 266 L424 266Z" fill="url(#robeG)"/>
+        <path d="M430 240 L436 230 L442 240 L448 230 L454 240 L460 230 L466 240 L472 230 L478 240 L484 230 L490 240 L496 230 L502 240 L508 230 L514 240 L520 230 L526 240 L532 230" stroke="#f1c40f" stroke-width="2.5" fill="none"/>
+        <path d="M480 140 V264" stroke="#f1c40f" stroke-width="2" stroke-dasharray="3 6"/>
+        <path d="M452 150 L414 206" stroke="#8e44ad" stroke-width="13" stroke-linecap="round"/>
+        <path d="M508 150 L546 206" stroke="#8e44ad" stroke-width="13" stroke-linecap="round"/>
+        <path d="M548 210 L560 150" stroke="#cfd8dc" stroke-width="5" stroke-linecap="round"/>
+        <path d="M540 206 h18" stroke="#f1c40f" stroke-width="4" stroke-linecap="round"/>
+        <rect x="370" y="126" width="220" height="10" rx="5" fill="#f1c40f"/>
+        <g id="heads"></g>
+      </g>
 
-        <!-- fire -->
-        <g id="fire"></g>
-      </svg>
-    </div>
-    <div class="row" style="margin-top:16px">
-      <button id="burn">🔥 Shoot the arrow</button>
-      <button class="ghost" id="reset">Rebuild</button>
-    </div>
-    <div class="victory" id="victory"></div>
-  </section>
+      <g id="fire"></g>
+    </svg>
+  </div>
 
-  <h2>Wishes to share</h2>
-  <div class="grid" id="grid"></div>
+  <div class="controls">
+    <button id="shootBtn">Release Divine Arrow</button>
+  </div>
+  <div class="victory" id="victory"></div>
 
-  <footer>Jai Shri Ram 🙏 · Wishing you joy, courage and sweet jalebis.</footer>
-</main>
+  <script>
+    const NS = 'http://www.w3.org/2000/svg';
+    const $ = id => document.getElementById(id);
+    function el(tag, attrs, parent) {
+      const e = document.createElementNS(NS, tag);
+      for (const k in attrs) e.setAttribute(k, attrs[k]);
+      if (parent) parent.appendChild(e);
+      return e;
+    }
 
-<script>
-const wishes = [
-  "May Lord Rama's arrows pierce through every obstacle in your path. Happy Dussehra!",
-  "May the burning of Ravana burn away your worries and bring you peace and prosperity.",
-  "Wishing you the courage to face your fears and the wisdom to choose what's right.",
-  "On this Vijayadashami, may all your goals be victorious and your heart full of light.",
-  "May your life be as bright as the festival fires and as sweet as the jalebis. Shubh Dussehra!",
-  "Let's burn the Ravana of ego, anger and envy within us. Happy Dussehra to you and your family!",
-  "May Goddess Durga and Lord Rama bless you with strength, health and happiness.",
-  "Truth wins, always. May this Dussehra remind you that your goodness is your greatest power.",
-  "Wishing you a new beginning, new energy and new victories. विजयादशमी की शुभकामनाएँ!"
-];
-let who = "";
-const grid = document.getElementById('grid');
-const greet = document.getElementById('greet');
+    /* ---------- fireworks overlay ---------- */
+    const cv = $('fx'), ctx = cv.getContext('2d');
+    let particles = [];
+    function size() { cv.width = innerWidth; cv.height = innerHeight; }
+    addEventListener('resize', size); size();
+    const colors = ['#ffbe0b', '#fb5607', '#ff006e', '#ffeaa7'];
+    function burst(x, y) {
+      for (let i = 0; i < 60; i++) {
+        const a = Math.random() * Math.PI * 2, s = 1.5 + Math.random() * 4.5;
+        particles.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 1.5, life: 1,
+          decay: .012 + Math.random() * .012, color: colors[Math.floor(Math.random() * 4)] });
+      }
+    }
+    (function tick() {
+      ctx.clearRect(0, 0, cv.width, cv.height);
+      particles = particles.filter(p => p.life > 0);
+      for (const p of particles) {
+        p.x += p.vx; p.y += p.vy; p.vy += .05; p.vx *= .99; p.life -= p.decay;
+        ctx.globalAlpha = Math.max(p.life, 0);
+        ctx.fillStyle = p.color;
+        ctx.beginPath(); ctx.arc(p.x, p.y, 2.6, 0, 6.283); ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+      requestAnimationFrame(tick);
+    })();
 
-function setName(n){
-  who = n.trim();
-  greet.textContent = who ? `Dear ${who}, wishing you a victorious Dussehra! ✨` : "";
-  render();
-}
-function render(){
-  grid.innerHTML = "";
-  wishes.forEach(w=>{
-    const text = (who ? `Dear ${who}, ` + w.charAt(0).toLowerCase() + w.slice(1) : w);
-    const c = document.createElement('div'); c.className = 'card';
-    const p = document.createElement('p'); p.textContent = text;
-    const b = document.createElement('button'); b.textContent = 'Copy';
-    b.onclick = async ()=>{
-      try{ await navigator.clipboard.writeText(text); b.textContent='Copied ✓'; }
-      catch(e){ b.textContent='Press Ctrl/Cmd+C'; }
-      setTimeout(()=>b.textContent='Copy',1500);
-    };
-    c.append(p,b); grid.append(c);
-  });
-}
-document.getElementById('nameForm').onsubmit = e=>{ e.preventDefault(); setName(document.getElementById('name').value); };
-setName(new URLSearchParams(location.search).get('name') || "");
+    /* ---------- scene drawing ---------- */
+    for (let i = 0; i < 40; i++) {
+      el('circle', { cx: Math.random() * 620, cy: Math.random() * 120, r: Math.random() * 1.3 + .3,
+        class: 'twinkle', style: `animation-delay:${(Math.random() * 2.4).toFixed(2)}s` }, $('stars'));
+    }
+    for (let x = 8; x < 620; x += 17 + Math.random() * 8) {
+      if (x > 40 && x < 190) continue;
+      const h = 10 + Math.random() * 8, y = 300 - h;
+      el('circle', { cx: x, cy: y - 5, r: 5 }, $('crowd'));
+      el('rect', { x: x - 6, y, width: 12, height: h + 2, rx: 5 }, $('crowd'));
+    }
+    function head(cx, cy, r, main) {
+      const g = el('g', {}, $('heads'));
+      el('path', { d: `M${cx-r*.8} ${cy-r*.7} L${cx-r*.5} ${cy-r*1.6} L${cx-r*.15} ${cy-r*.95} L${cx} ${cy-r*1.8} L${cx+r*.15} ${cy-r*.95} L${cx+r*.5} ${cy-r*1.6} L${cx+r*.8} ${cy-r*.7}Z`,
+        fill: '#f1c40f', stroke: '#b8860b', 'stroke-width': 1 }, g);
+      el('circle', { cx, cy, r, fill: main ? '#c0440a' : '#d35400', stroke: '#f1c40f', 'stroke-width': 1.5 }, g);
+      for (const s of [-1, 1]) {
+        el('circle', { cx: cx + s * r * .38, cy: cy - r * .12, r: r * .22, fill: '#fff' }, g);
+        el('circle', { cx: cx + s * r * .38, cy: cy - r * .1, r: r * .1, fill: '#000' }, g);
+        el('path', { d: `M${cx+s*r*.15} ${cy-r*.32} L${cx+s*r*.65} ${cy-r*.5}`, stroke: '#000', 'stroke-width': r * .13, 'stroke-linecap': 'round' }, g);
+      }
+      el('path', { d: `M${cx-r*.6} ${cy+r*.45} Q${cx} ${cy+r*.05} ${cx+r*.6} ${cy+r*.45}`, stroke: '#000', 'stroke-width': r * .15, fill: 'none', 'stroke-linecap': 'round' }, g);
+      el('path', { d: `M${cx-r*.25} ${cy+r*.62} Q${cx} ${cy+r*.75} ${cx+r*.25} ${cy+r*.62}`, stroke: '#7b0d0d', 'stroke-width': r * .12, fill: 'none' }, g);
+    }
+    for (let i = 4; i >= 1; i--) { head(480 - i * 26, 116, 13, false); head(480 + i * 26, 116, 13, false); }
+    head(480, 62, 11, false);
+    head(480, 106, 19, true); // 10 heads in all
 
-/* fireworks */
-const cv = document.getElementById('fx'), ctx = cv.getContext('2d');
-let parts = [];
-function size(){ cv.width = innerWidth; cv.height = innerHeight; }
-addEventListener('resize', size); size();
-function burst(x,y){
-  const hue = 20 + Math.random()*40;
-  for(let i=0;i<70;i++){
-    const a = Math.random()*Math.PI*2, s = 1+Math.random()*5;
-    parts.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:1,hue});
-  }
-}
-function tick(){
-  ctx.clearRect(0,0,cv.width,cv.height);
-  parts = parts.filter(p=>p.life>0);
-  for(const p of parts){
-    p.x+=p.vx; p.y+=p.vy; p.vy+=.06; p.vx*=.99; p.life-=.012;
-    ctx.fillStyle = `hsla(${p.hue},100%,60%,${p.life})`;
-    ctx.beginPath(); ctx.arc(p.x,p.y,2.2,0,6.283); ctx.fill();
-  }
-  requestAnimationFrame(tick);
-}
-tick();
-addEventListener('click', e=>{ if(!e.target.closest('button,input,svg')) burst(e.clientX,e.clientY); });
+    [[440,266,1.4],[470,266,1.7],[500,266,1.5],[526,266,1.2],[455,215,1.1],[505,215,1.1],[480,180,1.3],[420,212,.8],[548,212,.8],[480,128,1]]
+    .forEach(([x, y, s], i) => {
+      const g = el('g', { transform: `translate(${x} ${y}) scale(${s})` }, $('fire'));
+      const d = `animation-delay:${(i * .07).toFixed(2)}s`;
+      el('path', { class: 'flame', style: d, d: 'M0 0 C-16 -16 -10 -36 0 -56 C4 -40 18 -30 10 -14 C14 -8 8 0 0 0Z', fill: '#e8590c' }, g);
+      el('path', { class: 'flame', style: d, d: 'M0 0 C-10 -10 -6 -24 0 -38 C6 -24 10 -10 0 0Z', fill: '#ffa600' }, g);
+      el('path', { class: 'flame', style: d, d: 'M0 0 C-5 -6 -3 -12 0 -20 C3 -12 5 -6 0 0Z', fill: '#ffe066' }, g);
+    });
 
-/* ---------- scene drawing ---------- */
-const NS = 'http://www.w3.org/2000/svg';
-const $ = id => document.getElementById(id);
-function el(tag, attrs, parent){
-  const e = document.createElementNS(NS, tag);
-  for(const k in attrs) e.setAttribute(k, attrs[k]);
-  if(parent) parent.appendChild(e);
-  return e;
-}
-// stars
-for(let i=0;i<40;i++){
-  el('circle',{cx:Math.random()*620, cy:Math.random()*120, r:Math.random()*1.3+.3,
-    class:'twinkle', style:`animation-delay:${(Math.random()*2.4).toFixed(2)}s`}, $('stars'));
-}
-// crowd silhouettes along the bottom
-for(let x=8;x<620;x+=17+Math.random()*8){
-  if(x>40 && x<190) continue; // keep Rama clear
-  const h = 10 + Math.random()*8, y = 300 - h;
-  el('circle',{cx:x, cy:y-5, r:5}, $('crowd'));
-  el('rect',{x:x-6, y:y, width:12, height:h+2, rx:5}, $('crowd'));
-}
-// ten heads of Ravana
-function head(cx, cy, r, main){
-  const g = el('g', {}, $('heads'));
-  el('path',{d:`M${cx-r*.8} ${cy-r*.7} L${cx-r*.5} ${cy-r*1.6} L${cx-r*.15} ${cy-r*.95} L${cx} ${cy-r*1.8} L${cx+r*.15} ${cy-r*.95} L${cx+r*.5} ${cy-r*1.6} L${cx+r*.8} ${cy-r*.7}Z`,
-    fill:'#ffd166', stroke:'#b8860b', 'stroke-width':1}, g);
-  el('circle',{cx, cy, r, fill: main ? '#2e7d32' : '#388e3c', stroke:'#ffd166', 'stroke-width':1.5}, g);
-  for(const s of [-1,1]){
-    el('circle',{cx:cx+s*r*.38, cy:cy-r*.12, r:r*.22, fill:'#fff'}, g);
-    el('circle',{cx:cx+s*r*.38, cy:cy-r*.1, r:r*.1, fill:'#000'}, g);
-    el('path',{d:`M${cx+s*r*.15} ${cy-r*.32} L${cx+s*r*.65} ${cy-r*.5}`, stroke:'#000', 'stroke-width':r*.13, 'stroke-linecap':'round'}, g);
-  }
-  el('path',{d:`M${cx-r*.6} ${cy+r*.45} Q${cx} ${cy+r*.05} ${cx+r*.6} ${cy+r*.45}`, stroke:'#000', 'stroke-width':r*.15, fill:'none', 'stroke-linecap':'round'}, g);
-  el('path',{d:`M${cx-r*.25} ${cy+r*.62} Q${cx} ${cy+r*.75} ${cx+r*.25} ${cy+r*.62}`, stroke:'#b71c1c', 'stroke-width':r*.12, fill:'none'}, g);
-}
-const sideHeads = [];
-for(let i=4;i>=1;i--) sideHeads.push([480-i*26,116,13],[480+i*26,116,13]);
-sideHeads.forEach(h=>head(...h,false));
-head(480,62,11,false);
-head(480,106,19,true);   // 4 + 4 + 1 + main = 10 heads
+    /* ---------- animation ---------- */
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const REST = 168, DRAWN = 116, Y = 145;
+    function setPull(x) {
+      $('string').setAttribute('points', `168,58 ${x},${Y} 168,232`);
+      $('backArm').setAttribute('d', `M100 124 L${x} ${Y}`);
+      $('pullHand').setAttribute('cx', x);
+    }
+    function setArrow(x) { $('arrow').setAttribute('transform', `translate(${x} ${Y})`); }
+    function tween(ms, fn) {
+      return new Promise(res => {
+        if (reduce) ms = 1;
+        const t0 = performance.now();
+        (function step(now) {
+          const t = Math.min(1, (now - t0) / ms);
+          fn(t);
+          t < 1 ? requestAnimationFrame(step) : res();
+        })(t0);
+      });
+    }
+    const wait = ms => new Promise(r => setTimeout(r, reduce ? 1 : ms));
+    const ease = t => 1 - Math.pow(1 - t, 3);
 
-// fire on the effigy
-[[440,266,1.4],[470,266,1.7],[500,266,1.5],[526,266,1.2],[455,215,1.1],[505,215,1.1],[480,180,1.3],[420,212,.8],[548,212,.8],[480,128,1]]
-.forEach(([x,y,s],i)=>{
-  const g = el('g',{transform:`translate(${x} ${y}) scale(${s})`}, $('fire'));
-  const d = `animation-delay:${(i*.07).toFixed(2)}s`;
-  el('path',{class:'flame', style:d, d:'M0 0 C-16 -16 -10 -36 0 -56 C4 -40 18 -30 10 -14 C14 -8 8 0 0 0Z', fill:'#e8590c'}, g);
-  el('path',{class:'flame', style:d, d:'M0 0 C-10 -10 -6 -24 0 -38 C6 -24 10 -10 0 0Z', fill:'#ffa600'}, g);
-  el('path',{class:'flame', style:d, d:'M0 0 C-5 -6 -3 -12 0 -20 C3 -12 5 -6 0 0Z', fill:'#ffe066'}, g);
-});
+    let busy = false, burnt = false;
+    const vic = $('victory');
 
-/* ---------- animation ---------- */
-const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const REST = 168, DRAWN = 116, Y = 145;
-function setPull(x){
-  $('string').setAttribute('points', `168,58 ${x},${Y} 168,232`);
-  $('backArm').setAttribute('d', `M100 124 L${x} ${Y}`);
-  $('pullHand').setAttribute('cx', x);
-}
-function setArrow(x){ $('arrow').setAttribute('transform', `translate(${x} ${Y})`); }
-function tween(ms, fn){
-  return new Promise(res=>{
-    if(reduce) ms = 1;
-    const t0 = performance.now();
-    (function step(now){
-      const t = Math.min(1, (now - t0) / ms);
-      fn(t);
-      t < 1 ? requestAnimationFrame(step) : res();
-    })(t0);
-  });
-}
-const wait = ms => new Promise(r=>setTimeout(r, reduce ? 1 : ms));
-const ease = t => 1 - Math.pow(1 - t, 3);
+    async function rebuild() {
+      const eff = $('effigy');
+      eff.classList.add('instant');
+      eff.classList.remove('charred', 'fall');
+      $('fire').classList.remove('on', 'out');
+      $('arrow').style.opacity = 1; $('tipfire').style.opacity = 0; $('trail').setAttribute('opacity', 0);
+      setPull(REST); setArrow(REST);
+      vic.textContent = '';
+      void eff.getBoundingClientRect();
+      eff.classList.remove('instant');
+      await wait(250);
+      burnt = false;
+    }
 
-let busy = false, done = false;
-const vic = $('victory'), shootBtn = $('burn');
+    async function triggerShoot() {
+      if (busy) return;
+      busy = true;
+      if (burnt) await rebuild();
+      await tween(800, t => { const x = REST - (REST - DRAWN) * ease(t); setPull(x); setArrow(x); });
+      $('tipfire').style.opacity = 1;
+      await wait(350);
+      $('halo').classList.remove('flash'); void $('halo').getBoundingClientRect(); $('halo').classList.add('flash');
+      $('trail').setAttribute('opacity', 1);
+      tween(140, t => setPull(DRAWN + (REST - DRAWN) * t));
+      await tween(520, t => setArrow(DRAWN + (348 - DRAWN) * t * t));
+      $('arrow').style.opacity = 0;
+      $('fire').classList.add('on');
+      $('effigy').classList.add('charred');
+      vic.textContent = 'Jai Shri Ram! Good triumphs over evil. 🎆';
+      const r = $('effigy').getBoundingClientRect();
+      for (let i = 0; i < 9; i++) setTimeout(() => burst(
+        r.left + Math.random() * r.width, r.top + Math.random() * r.height * .8), reduce ? 0 : i * 260);
+      await wait(1600);
+      $('effigy').classList.add('fall');
+      $('fire').classList.add('out');
+      burnt = true;
+      busy = false;
+    }
 
-shootBtn.onclick = async ()=>{
-  if(busy || done) return;
-  busy = true; shootBtn.disabled = true;
-  // 1. draw the bow
-  await tween(800, t=>{ const x = REST - (REST-DRAWN)*ease(t); setPull(x); setArrow(x); });
-  $('tipfire').style.opacity = 1;
-  await wait(350);
-  // 2. release
-  $('halo').classList.remove('flash'); void $('halo').offsetWidth; $('halo').classList.add('flash');
-  $('trail').setAttribute('opacity', 1);
-  tween(140, t=> setPull(DRAWN + (REST-DRAWN)*t));
-  await tween(520, t=> setArrow(DRAWN + (348-DRAWN)*t*t));
-  // 3. hit
-  $('arrow').style.opacity = 0;
-  $('fire').classList.add('on');
-  $('effigy').classList.add('charred');
-  vic.textContent = "Jai Shri Ram! Evil is defeated. 🎆";
-  const r = $('effigy').getBoundingClientRect();
-  for(let i=0;i<9;i++) setTimeout(()=>burst(
-    r.left + Math.random()*r.width, r.top + Math.random()*r.height*.8), (reduce?0:i*260));
-  // 4. collapse
-  await wait(1600);
-  $('effigy').classList.add('fall');
-  $('fire').classList.add('out');
-  busy = false; done = true;
-};
-
-$('reset').onclick = ()=>{
-  if(busy) return;
-  done = false; shootBtn.disabled = false;
-  $('effigy').classList.remove('charred','fall');
-  $('fire').classList.remove('on','out');
-  $('arrow').style.opacity = 1; $('tipfire').style.opacity = 0; $('trail').setAttribute('opacity', 0);
-  setPull(REST); setArrow(REST);
-  vic.textContent = "";
-};
-</script>
+    $('shootBtn').addEventListener('click', triggerShoot);
+    $('stage').addEventListener('click', triggerShoot);
+  </script>
 </body>
 </html>
