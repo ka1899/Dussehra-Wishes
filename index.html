@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Happy Dussehra</title>
+<style>
+  :root{
+    --bg1:#2b0a3d; --bg2:#8a1c1c; --bg3:#e8590c;
+    --gold:#ffd166; --cream:#fff6e5; --ink:#3a1200;
+  }
+  *{box-sizing:border-box;margin:0}
+  body{
+    min-height:100vh; font-family:Georgia,"Times New Roman",serif; color:var(--cream);
+    background:linear-gradient(180deg,var(--bg1) 0%,var(--bg2) 55%,var(--bg3) 100%) fixed;
+    overflow-x:hidden;
+  }
+  canvas{position:fixed;inset:0;pointer-events:none;z-index:0}
+  main{position:relative;z-index:1;max-width:880px;margin:0 auto;padding:0 16px 64px}
+  header{text-align:center;padding:56px 0 24px}
+  .bow{font-size:64px;line-height:1;filter:drop-shadow(0 0 16px var(--gold))}
+  h1{font-size:clamp(2.4rem,8vw,4.5rem);color:var(--gold);letter-spacing:.02em;margin-top:8px;text-shadow:0 0 24px rgba(255,209,102,.5)}
+  .deva{font-size:clamp(1.4rem,5vw,2.2rem);margin-top:4px;opacity:.95}
+  .tag{margin-top:12px;font-style:italic;opacity:.85}
+  .greet{margin-top:20px;font-size:1.3rem;color:var(--gold);min-height:1.6em}
+
+  .stage{margin:28px auto 8px;text-align:center}
+  .effigy{font-size:110px;line-height:1;display:inline-block;transition:transform .3s}
+  .effigy.burn{animation:burn 2.2s ease-in forwards}
+  @keyframes burn{
+    0%{filter:none;transform:scale(1)}
+    40%{filter:sepia(1) saturate(6) hue-rotate(-20deg) brightness(1.2);transform:scale(1.05) rotate(-2deg)}
+    100%{filter:brightness(0) blur(6px);opacity:0;transform:scale(.6) translateY(30px)}
+  }
+  .scene{position:relative;display:flex;align-items:center;justify-content:space-between;max-width:520px;margin:0 auto;height:140px}
+  .ram{font-size:84px;filter:drop-shadow(0 0 12px var(--gold))}
+  .arrow{position:absolute;left:90px;top:50%;margin-top:-22px;font-size:40px;color:var(--gold);opacity:0;white-space:nowrap}
+  .arrow.fly{animation:fly .9s cubic-bezier(.5,0,.9,.6) forwards}
+  @keyframes fly{0%{opacity:1;transform:translateX(0)}90%{opacity:1}100%{opacity:0;transform:translateX(300px)}}
+  .ramgif{display:block;max-width:min(360px,90%);margin:14px auto 0;border-radius:16px;border:3px solid var(--gold)}
+  button{
+    font:inherit;cursor:pointer;border:0;border-radius:999px;padding:12px 22px;
+    background:var(--gold);color:var(--ink);font-weight:bold;box-shadow:0 4px 0 #b8860b;
+  }
+  button:active{transform:translateY(3px);box-shadow:0 1px 0 #b8860b}
+  button.ghost{background:transparent;color:var(--cream);border:1px solid rgba(255,246,229,.5);box-shadow:none}
+  .victory{font-size:1.3rem;color:var(--gold);margin-top:14px;min-height:1.6em}
+
+  h2{text-align:center;color:var(--gold);margin:44px 0 18px;font-size:1.6rem}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+  .card{
+    background:rgba(255,246,229,.95);color:var(--ink);border-radius:16px;padding:20px;
+    border-top:6px solid var(--gold);box-shadow:0 8px 24px rgba(0,0,0,.3);
+    display:flex;flex-direction:column;gap:12px;justify-content:space-between;
+  }
+  .card p{line-height:1.5}
+  .card button{align-self:flex-start;padding:7px 14px;font-size:.85rem;background:var(--ink);color:var(--gold);box-shadow:none}
+  .row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+  form{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:20px}
+  input{
+    font:inherit;padding:11px 16px;border-radius:999px;border:1px solid var(--gold);
+    background:rgba(255,246,229,.12);color:var(--cream);min-width:0;width:230px;
+  }
+  input::placeholder{color:rgba(255,246,229,.6)}
+  footer{text-align:center;margin-top:48px;opacity:.8;font-style:italic}
+  @media (prefers-reduced-motion:reduce){.effigy.burn{animation-duration:.01s}}
+</style>
+</head>
+<body>
+<canvas id="fx"></canvas>
+<main>
+  <header>
+    <div class="bow">🏹</div>
+    <h1>Happy Dussehra</h1>
+    <div class="deva">विजयादशमी की हार्दिक शुभकामनाएँ</div>
+    <p class="tag">Victory of good over evil, light over darkness.</p>
+    <div class="greet" id="greet"></div>
+    <form id="nameForm">
+      <input id="name" placeholder="Add a name to personalise" maxlength="30" autocomplete="off">
+      <button type="submit">Greet</button>
+    </form>
+  </header>
+
+  <section class="stage">
+    <div class="scene" id="scene">
+      <span class="ram">🏹</span>
+      <span class="arrow" id="arrow">➳🔥</span>
+      <div class="effigy" id="effigy">👹</div>
+    </div>
+    <img id="ramgif" class="ramgif" src="ram.gif" alt="Lord Rama shooting the arrow" hidden onload="this.hidden=false">
+    <div class="row" style="margin-top:14px">
+      <button id="burn">🔥 Light the effigy</button>
+      <button class="ghost" id="reset">Rebuild</button>
+    </div>
+    <div class="victory" id="victory"></div>
+  </section>
+
+  <h2>Wishes to share</h2>
+  <div class="grid" id="grid"></div>
+
+  <footer>Jai Shri Ram 🙏 · Wishing you joy, courage and sweet jalebis.</footer>
+</main>
+
+<script>
+const wishes = [
+  "May Lord Rama's arrows pierce through every obstacle in your path. Happy Dussehra!",
+  "May the burning of Ravana burn away your worries and bring you peace and prosperity.",
+  "Wishing you the courage to face your fears and the wisdom to choose what's right.",
+  "On this Vijayadashami, may all your goals be victorious and your heart full of light.",
+  "May your life be as bright as the festival fires and as sweet as the jalebis. Shubh Dussehra!",
+  "Let's burn the Ravana of ego, anger and envy within us. Happy Dussehra to you and your family!",
+  "May Goddess Durga and Lord Rama bless you with strength, health and happiness.",
+  "Truth wins, always. May this Dussehra remind you that your goodness is your greatest power.",
+  "Wishing you a new beginning, new energy and new victories. विजयादशमी की शुभकामनाएँ!"
+];
+let who = "";
+const grid = document.getElementById('grid');
+const greet = document.getElementById('greet');
+
+function setName(n){
+  who = n.trim();
+  greet.textContent = who ? `Dear ${who}, wishing you a victorious Dussehra! ✨` : "";
+  render();
+}
+function render(){
+  grid.innerHTML = "";
+  wishes.forEach(w=>{
+    const text = (who ? `Dear ${who}, ` + w.charAt(0).toLowerCase() + w.slice(1) : w);
+    const c = document.createElement('div'); c.className = 'card';
+    const p = document.createElement('p'); p.textContent = text;
+    const b = document.createElement('button'); b.textContent = 'Copy';
+    b.onclick = async ()=>{
+      try{ await navigator.clipboard.writeText(text); b.textContent='Copied ✓'; }
+      catch(e){ b.textContent='Press Ctrl/Cmd+C'; }
+      setTimeout(()=>b.textContent='Copy',1500);
+    };
+    c.append(p,b); grid.append(c);
+  });
+}
+document.getElementById('nameForm').onsubmit = e=>{ e.preventDefault(); setName(document.getElementById('name').value); };
+setName(new URLSearchParams(location.search).get('name') || "");
+
+/* fireworks */
+const cv = document.getElementById('fx'), ctx = cv.getContext('2d');
+let parts = [];
+function size(){ cv.width = innerWidth; cv.height = innerHeight; }
+addEventListener('resize', size); size();
+function burst(x,y){
+  const hue = 20 + Math.random()*40;
+  for(let i=0;i<70;i++){
+    const a = Math.random()*Math.PI*2, s = 1+Math.random()*5;
+    parts.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:1,hue});
+  }
+}
+function tick(){
+  ctx.clearRect(0,0,cv.width,cv.height);
+  parts = parts.filter(p=>p.life>0);
+  for(const p of parts){
+    p.x+=p.vx; p.y+=p.vy; p.vy+=.06; p.vx*=.99; p.life-=.012;
+    ctx.fillStyle = `hsla(${p.hue},100%,60%,${p.life})`;
+    ctx.beginPath(); ctx.arc(p.x,p.y,2.2,0,6.283); ctx.fill();
+  }
+  requestAnimationFrame(tick);
+}
+tick();
+addEventListener('click', e=>{ if(!e.target.closest('button,input')) burst(e.clientX,e.clientY); });
+
+/* effigy */
+const eff = document.getElementById('effigy'), vic = document.getElementById('victory');
+document.getElementById('burn').onclick = ()=>{
+  const ar = document.getElementById('arrow');
+  ar.classList.remove('fly'); void ar.offsetWidth; ar.classList.add('fly');
+  setTimeout(()=>eff.classList.add('burn'), 800);
+  vic.textContent = "Jai Shri Ram! Evil is defeated. 🎆";
+  const r = eff.getBoundingClientRect();
+  for(let i=0;i<8;i++) setTimeout(()=>burst(
+    r.left + Math.random()*r.width*3 - r.width, r.top + Math.random()*r.height), 800 + i*250);
+};
+document.getElementById('reset').onclick = ()=>{
+  eff.classList.remove('burn'); document.getElementById('arrow').classList.remove('fly'); eff.style.opacity=1; vic.textContent="";
+};
+</script>
+</body>
+</html>
